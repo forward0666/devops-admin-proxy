@@ -36,6 +36,8 @@ proxy.on('error', (err, req, res) => {
 });
 
 const server = http.createServer((req, res) => {
+  console.log(`[proxy] incoming: ${req.method} ${req.url}`);
+
   // Health check
   if (req.url === '/healthz' || req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
