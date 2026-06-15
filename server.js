@@ -21,6 +21,14 @@ const routes = ROUTES_ENV.split(',').map(r => {
 
 const proxy = httpProxy.createProxyServer({ changeOrigin: true });
 
+proxy.on('proxyReq', (proxyReq, req) => {
+  console.log(`[proxy] -> ${req.method} ${req.url} -> ${proxyReq.getHeader('host')}${proxyReq.path}`);
+});
+
+proxy.on('proxyRes', (proxyRes, req) => {
+  console.log(`[proxy] <- ${proxyRes.statusCode} ${req.url} content-type: ${proxyRes.headers['content-type']}`);
+});
+
 proxy.on('error', (err, req, res) => {
   console.error(`[proxy] error for ${req.url}: ${err.message}`);
   res.writeHead(502, { 'Content-Type': 'text/plain' });
