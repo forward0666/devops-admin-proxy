@@ -46,7 +46,10 @@ const server = http.createServer((req, res) => {
 
   for (const route of routes) {
     if (req.url.startsWith(route.prefix)) {
-      console.log(`[proxy] ${req.url} -> ${route.target}${req.url}`);
+      const targetPath = req.url.slice(route.prefix.length) || '/';
+      const fullTarget = route.target + targetPath;
+      console.log(`[proxy] ${req.url} -> ${fullTarget}`);
+      req.url = targetPath;
       return proxy.web(req, res, { target: route.target });
     }
   }
