@@ -19,6 +19,12 @@ proxy.on('error', (err, req, res) => {
 });
 
 const server = http.createServer((req, res) => {
+  // Health check
+  if (req.url === '/healthz' || req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    return res.end('OK');
+  }
+
   for (const route of routes) {
     if (req.url.startsWith(route.prefix)) {
       const targetPath = req.url.slice(route.prefix.length) || '/';
