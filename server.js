@@ -1,9 +1,18 @@
 const http = require('http');
 const httpProxy = require('http-proxy');
+const fs = require('fs');
+const path = require('path');
 
-// 配置：路径前缀 -> 目标服务
-// 环境变量格式：PROXY_ROUTES=/user/tool/ittool->http://it-tools:80,/api/foo->http://foo:8080
-const ROUTES_ENV = process.env.PROXY_ROUTES || '/user/tool/ittool->http://localhost:5050';
+// 优先从文件读取，fallback 到环境变量
+const CONFIG_FILE = process.env.PROXY_ROUTES_FILE || '/etc/proxy/routes.conf';
+let ROUTES_ENV;
+try {
+  ROUTES_ENV = fs.readFileSync(CONFIG_FILE, 'utf-8').trim();
+  console.log(`[proxy] loaded routes from ${CONFIG_FILE}`);
+} catch {
+  ROUTES_ENV = process.env.PROXY_ROUTES || '/user/tool/ittool->http://localhost:5050';
+  console.log(`[proxy] loaded routes from env`);
+}
 
 const routes = ROUTES_ENV.split(',').map(r => {
   const [prefix, target] = r.split('->').map(s => s.trim());
